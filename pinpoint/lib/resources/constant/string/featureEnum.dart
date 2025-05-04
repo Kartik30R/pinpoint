@@ -1,0 +1,1 @@
+enum PropertyKey { id, type, name, floor }
