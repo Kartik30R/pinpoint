@@ -2,6 +2,9 @@ package com.nxquar.pinpoint.Model.Users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nxquar.pinpoint.Model.Address;
+import com.nxquar.pinpoint.Model.Batch;
+import com.nxquar.pinpoint.Model.Building;
+import com.nxquar.pinpoint.Model.Timetable.Subject;
 import com.nxquar.pinpoint.constant.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -34,10 +37,19 @@ public class Institute implements  AppUser {
     @Enumerated(EnumType.STRING)
     private Role role=Role.INSTITUTE;
 
+private String geoJsonUrl;
     @OneToOne
     private Address address;
 
 
+    @OneToMany(mappedBy = "institute")
+    private List<Building> buildings;
+
+    @OneToMany(mappedBy = "institute")
+    private List<Batch> batches;
+
+    @OneToMany(mappedBy = "institute")
+    private List<Subject> subjects;
 
     @JsonIgnore
     @OneToMany(mappedBy = "institute")

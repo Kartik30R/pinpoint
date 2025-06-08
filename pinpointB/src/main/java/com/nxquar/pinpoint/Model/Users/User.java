@@ -2,10 +2,7 @@ package com.nxquar.pinpoint.Model.Users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.nxquar.pinpoint.Model.Address;
-import com.nxquar.pinpoint.Model.LocationPoint;
-import com.nxquar.pinpoint.Model.Note;
-import com.nxquar.pinpoint.Model.Notice;
+import com.nxquar.pinpoint.Model.*;
 import com.nxquar.pinpoint.constant.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -39,6 +36,9 @@ public class User implements  AppUser{
     private Role role=Role.USER;
     @OneToOne
     private Address address;
+
+    @ManyToOne
+    private Batch batch;
 
     private boolean checkedIn;
 

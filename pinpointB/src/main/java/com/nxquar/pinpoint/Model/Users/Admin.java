@@ -2,6 +2,7 @@ package com.nxquar.pinpoint.Model.Users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nxquar.pinpoint.Model.Address;
+import com.nxquar.pinpoint.Model.Batch;
 import com.nxquar.pinpoint.Model.Note;
 import com.nxquar.pinpoint.Model.Notice;
 import com.nxquar.pinpoint.constant.Role;
@@ -39,6 +40,8 @@ public class Admin implements  AppUser{
 @OneToOne
     private Address address;
 
+    @ManyToMany
+    private List<Batch> batch;
     @ManyToOne
     private Institute institute;
 

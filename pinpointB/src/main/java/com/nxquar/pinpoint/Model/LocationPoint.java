@@ -28,7 +28,7 @@ public class LocationPoint {
 
     private double altitude;
 
-    private String location; // Optional name like "Reception", "Room 101"
+    private String location; // Optional name like "Reception", " 101"
 
     private Integer floor;    // Floor info like "Ground", "1st", "B1"
 
