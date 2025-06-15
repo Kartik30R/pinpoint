@@ -42,20 +42,20 @@ private String geoJsonUrl;
     private Address address;
 
 
-    @OneToMany(mappedBy = "institute")
+    @OneToMany(mappedBy = "institute", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Building> buildings;
 
-    @OneToMany(mappedBy = "institute")
+    @OneToMany(mappedBy = "institute", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Batch> batches;
 
-    @OneToMany(mappedBy = "institute")
+    @OneToMany(mappedBy = "institute", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Subject> subjects;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "institute")
+    @OneToMany(mappedBy = "institute", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<User> userList=new ArrayList<>();
 @JsonIgnore
-    @OneToMany(mappedBy = "institute")
+@OneToMany(mappedBy = "institute", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Admin> adminList=new ArrayList<>();
 
     private LocalDateTime createdAt;

@@ -1,6 +1,7 @@
 package com.nxquar.pinpoint.Repository;
 
 import com.nxquar.pinpoint.Model.Users.Admin;
+import com.nxquar.pinpoint.Model.Users.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -20,5 +21,10 @@ public interface AdminRepo extends JpaRepository<Admin, UUID> {
     @Modifying
     @Query("UPDATE Admin a SET a.institute = null WHERE a.institute.id = :instituteId")
     void updateInstituteToNullForAdmins(@Param("instituteId") UUID instituteId);
+
+    List<User> findUsersByAdminId(UUID id);
+
+    @Query("SELECT u FROM User u WHERE u.id = :userId AND u.admin.id = :adminId")
+    User findUserByIdAndAdminId(@Param("userId") UUID userId, @Param("adminId") UUID adminId);
 
 }

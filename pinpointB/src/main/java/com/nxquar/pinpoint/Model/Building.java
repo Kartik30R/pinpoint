@@ -19,6 +19,7 @@ public class Building {
     @ManyToOne
     private Institute institute;
     
-    @OneToMany(mappedBy = "building")
+    @OneToMany(mappedBy = "building", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Floor> floors;
 }
+

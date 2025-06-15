@@ -46,7 +46,7 @@ public class Admin implements  AppUser{
     private Institute institute;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "admin")
+    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<User> userList=new ArrayList<>();
 @JsonIgnore
     @OneToMany(mappedBy = "sentBy")

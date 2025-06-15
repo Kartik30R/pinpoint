@@ -45,6 +45,12 @@ public class    LocationParsingService {
 
         for (JsonNode feature : features) {
             int floorLevel = feature.get("properties").get("floor").asInt();
+
+//            if (!featuresByFloor.containsKey(floorLevel)) {
+//                featuresByFloor.put(floorLevel, new ArrayList<>());
+//            }
+//            featuresByFloor.get(floorLevel).add(feature);
+
             featuresByFloor.computeIfAbsent(floorLevel, k -> new ArrayList<>()).add(feature);
         }
 

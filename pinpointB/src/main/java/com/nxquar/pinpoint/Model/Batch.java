@@ -27,9 +27,9 @@ public class Batch {
     @ManyToMany
     private List<Admin> admins;
 
-    @OneToMany(mappedBy = "batch")
+    @OneToMany(mappedBy = "batch", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<User> students = new ArrayList<>() ;
 
-    @OneToOne(mappedBy = "batch", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "batch", cascade = CascadeType.ALL, orphanRemoval = true)
     private Timetable timetable;
 }
