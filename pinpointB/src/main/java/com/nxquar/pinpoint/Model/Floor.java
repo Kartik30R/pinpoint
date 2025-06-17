@@ -1,5 +1,6 @@
 package com.nxquar.pinpoint.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.locationtech.jts.geom.Geometry;
@@ -17,6 +18,7 @@ public class Floor {
     private int level;
     
     @ManyToOne
+    @JsonIgnore
     private Building building;
     @OneToMany(mappedBy = "floor", cascade = CascadeType.ALL)
     private List<Room> rooms;

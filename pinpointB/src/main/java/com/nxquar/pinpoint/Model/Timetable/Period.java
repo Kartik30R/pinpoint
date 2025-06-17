@@ -1,6 +1,8 @@
 package com.nxquar.pinpoint.Model.Timetable;
 
-import com.nxquar.pinpoint.Model.Site;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.nxquar.pinpoint.Model.Room;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -9,6 +11,7 @@ import java.util.UUID;
 
 @Entity
 @Data
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Period {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,7 +30,7 @@ public class Period {
 //    private User teacher; // Optional
     
     @ManyToOne
-    private Site site;
+    private Room site;
     
     @ManyToOne
     private DaySchedule daySchedule;
