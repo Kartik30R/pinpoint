@@ -7,60 +7,90 @@ import 'package:pinpoint/data/exceptions/app_exceptions.dart';
 import 'package:pinpoint/data/network/base_api_response.dart';
 
 class NetworkApiService implements BaseApiServices {
+final baseUrl = 'https://049175ca7491.ngrok-free.app';
+@override
+Future getGetApiResponse(String url, {Map<String, String>? headers}) async {
+  if (kDebugMode) print(url);
 
-  @override
-  Future getGetApiResponse(String url) async {
-    if (kDebugMode) {
-      print(url);
-    }
-    dynamic responseJson ;
-    try {
+  dynamic responseJson;
+  try {
+    final mergedHeaders = {
+      'Content-Type': 'application/json',
+      if (headers != null) ...headers,
+    };
 
-      final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 20));
-      responseJson = returnResponse(response);
-    }on SocketException {
-      throw NoInternetException('');
-    }on TimeoutException {
-      throw FetchDataException('Network Request time out');
-    }
+    final response = await http.get(
+      Uri.parse(url),
+      headers: mergedHeaders,
+    ).timeout(const Duration(seconds: 20));
 
-    if (kDebugMode) {
-      print(responseJson);
-    }
-    return responseJson;
-
+    responseJson = returnResponse(response);
+  } on SocketException {
+    throw NoInternetException('');
+  } on TimeoutException {
+    throw FetchDataException('Network Request time out');
   }
 
+  if (kDebugMode) print(responseJson);
+  return responseJson;
+}
 
-  @override
-  Future getPostApiResponse(String url , dynamic data) async{
 
+@override
+Future getPostApiResponse(String url, dynamic data, {Map<String, String>? headers}) async {
 
-    if (kDebugMode) {
-      print(url);
-      print(data);
-    }
+  dynamic responseJson;
+  try {
+    final mergedHeaders = {
+      'Content-Type': 'application/json',
+      if (headers != null) ...headers,
+    };
 
-    dynamic responseJson ;
-    try {
+    http.Response response = await http.post(
+      Uri.parse(url),
+      headers: mergedHeaders,
+      body: jsonEncode(data),
+    ).timeout(const Duration(seconds: 10));
 
-      http.Response response = await http.post(
-        Uri.parse(url),
-        body: data
-      ).timeout( const Duration(seconds: 10));
-
-      responseJson = returnResponse(response);
-    }on SocketException {
-      throw NoInternetException('No Internet Connection');
-    }on TimeoutException {
-      throw FetchDataException('Network Request time out');
-    }
-
-    if (kDebugMode) {
-      print(responseJson);
-    }
-    return responseJson ;
+    responseJson = returnResponse(response);
+  } on SocketException {
+    throw NoInternetException('No Internet Connection');
+  } on TimeoutException {
+    throw FetchDataException('Network Request timed out');
   }
+
+  if (kDebugMode) {
+    print("Response → $responseJson");
+  }
+  return responseJson;
+}
+
+@override
+Future getDeleteApiResponse(String url, {Map<String, String>? headers}) async {
+  dynamic responseJson;
+  try {
+    final mergedHeaders = {
+      'Content-Type': 'application/json',
+      if (headers != null) ...headers,
+    };
+
+    final response = await http.delete(
+      Uri.parse(url),
+      headers: mergedHeaders,
+    ).timeout(const Duration(seconds: 10));
+
+    responseJson = returnResponse(response);
+  } on SocketException {
+    throw NoInternetException('No Internet Connection');
+  } on TimeoutException {
+    throw FetchDataException('Network Request timed out');
+  }
+
+  if (kDebugMode) print("Response → $responseJson");
+  return responseJson;
+}
+
+
 
   dynamic returnResponse (http.Response response){
     if (kDebugMode) {

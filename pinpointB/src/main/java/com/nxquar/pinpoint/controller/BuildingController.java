@@ -1,6 +1,10 @@
 package com.nxquar.pinpoint.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nxquar.pinpoint.DTO.MessageResponse;
 import com.nxquar.pinpoint.Model.Building;
+import com.nxquar.pinpoint.service.BuildingService;
 import com.nxquar.pinpoint.service.locationGeoJsonService.LocationParsingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,15 +12,19 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/auth/buildings")
+@RequestMapping("/api/buildings")
 public class BuildingController {
 
     @Autowired
-    private LocationParsingService buildingService;
+    private LocationParsingService locationParsingService;
+
+    @Autowired
+    private BuildingService buildingService;
 
     @PostMapping(
             path = "/upload",
@@ -27,10 +35,32 @@ public class BuildingController {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode geoJson = mapper.readTree(file.getInputStream());
-            Building building = buildingService.processGeoJsonBuilding(geoJson);
+            Building building = locationParsingService.processGeoJsonBuilding(geoJson);
             return ResponseEntity.ok(building);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Building> getBuildingById(@PathVariable UUID id,
+                                                    @RequestHeader("Authorization") String jwt) {
+        String token = jwt.replace("Bearer ", "");
+        return ResponseEntity.ok(buildingService.getBuildingById(id, token));
+    }
+
+    @GetMapping("/institute/{instituteId}")
+    public ResponseEntity<List<Building>> getBuildingsByInstitute(@PathVariable UUID instituteId,
+                                                                  @RequestHeader("Authorization") String jwt) {
+        String token = jwt.replace("Bearer ", "");
+        return ResponseEntity.ok(buildingService.getBuildingsByInstitute(instituteId, token));
+    }
+
+    @PutMapping("/{buildingId}/altitude")
+    public ResponseEntity<MessageResponse> updateBaseAltitude(@PathVariable UUID buildingId,
+                                                              @RequestParam Integer baseAltitude,
+                                                              @RequestHeader("Authorization") String jwt) {
+        String token = jwt.replace("Bearer ", "");
+        return ResponseEntity.ok(buildingService.updateBaseAltitude(baseAltitude, buildingId, token));
     }
 }

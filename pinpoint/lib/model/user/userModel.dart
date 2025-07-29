@@ -17,7 +17,7 @@ class UserModel extends BaseUser {
     email: email,
     firstName: firstName,
     lastName: lastName,
-    userType: UserType.user,
+    userType: UserRole.USER,
   );
 
   @override

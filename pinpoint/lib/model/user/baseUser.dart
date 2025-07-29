@@ -5,7 +5,7 @@ class BaseUser {
   String email;
   String firstName;
   String lastName;
-  UserType userType;
+  UserRole userType;
 
   BaseUser({
     required this.id,
@@ -28,6 +28,6 @@ class BaseUser {
     email: json['email'],
     firstName: json['firstName'],
     lastName: json['lastName'],
-    userType: UserType.values.firstWhere((e) => e.toString().split('.').last == json['userType']),
+    userType: UserRole.values.firstWhere((e) => e.toString().split('.').last == json['userType']),
   );
 }

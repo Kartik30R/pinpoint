@@ -1,48 +1,32 @@
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:pinpoint/repository/Storage/secure_storage_service.dart';
 
-import 'package:pinpoint/model/location/geoJsonModel.dart';
-import 'dart:convert';
-import 'package:flutter/services.dart';
-import 'package:pinpoint/resources/constant/string/featureEnum.dart';
+class GeoJsonUploadService {
+  final SecureStorageService storage;
 
-class GeoJsonService {
+  GeoJsonUploadService(this.storage);
 
+  Future<bool> uploadGeoJsonFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['geojson'],
+    );
 
-  Future<GeoJsonModel> parseGeoJson(String path) async {
-    final String data = await rootBundle.loadString(path);
-    final Map<String, dynamic> json = jsonDecode(data);
-    return GeoJsonModel.fromJson(json);
-  }
+    if (result != null && result.files.single.path != null) {
+      final file = File(result.files.single.path!);
+      final jwt = await storage.jwt;
 
+      final uri = Uri.parse('https://your.api.url/api/sites/upload');
+      final request = http.MultipartRequest('POST', uri)
+        ..headers['Authorization'] = 'Bearer $jwt'
+        ..files.add(await http.MultipartFile.fromPath('file', file.path));
 
-List<Feature> filterFeatures(List<Feature> features, PropertyKey key, dynamic value) {
-  return features.where((feature) {
-    final properties = feature.properties;
-    switch (key) {
-      case PropertyKey.id:
-        return properties.id == value;
-      case PropertyKey.type:
-        return properties.type == value;
-      case PropertyKey.name:
-        return properties.name == value;
-      case PropertyKey.floor:
-        return properties.floor == value;
+      final response = await request.send();
+      return response.statusCode == 200;
+    } else {
+      return false;
     }
-  }).toList();
-}
-//?  another way to filter features
-// List<Feature>  features = geoJson.features.where((feature) {
-      //   return feature.properties.floor == 1; // Filter by floor number
-      // }).toList();
-
-  // List<Map<String, dynamic>> extractData(List<Feature> features) {
-  //   return features.map((feature) {
-  //     return {
-  //       'id': feature.properties.id,
-  //       'name': feature.properties.name,
-  //       'type': feature.properties.type,
-  //       'floor': feature.properties.floor,
-  //       'coordinates': feature.geometry.coordinates,
-  //     };
-  //   }).toList();
-  // }
+  }
 }

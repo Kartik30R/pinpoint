@@ -7,8 +7,8 @@ import java.util.UUID;
 
 public interface FloorService {
 
-    Floor getFloorById(UUID id, String jwt);
+    Floor getFloorById(UUID id);
 
-    List<Floor> getFloorsByBuilding(UUID buildingId, String jwt);
+    List<Floor> getFloorsByBuilding(UUID buildingId);
 
 }

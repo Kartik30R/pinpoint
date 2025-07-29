@@ -33,4 +33,7 @@ public class LocationPoint {
     private Integer floor;    // Floor info like "Ground", "1st", "B1"
 
     private LocalDateTime timestamp;
+
+
+
 }

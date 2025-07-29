@@ -1,1 +1,6 @@
-enum UserType { admin, user }
+
+ enum UserRole {
+    ADMIN,
+    USER,
+    INSTITUTE
+}

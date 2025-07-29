@@ -10,10 +10,15 @@ import com.nxquar.pinpoint.Repository.TimeTableRepo;
 import com.nxquar.pinpoint.service.TimetableServices;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+
+
+@Service
 
 public class TimetableServicesImpl implements TimetableServices {
 @Autowired
@@ -45,17 +50,14 @@ return timetableList;
 
     @Override
     public Timetable createTimeTable(TimetableRequest dto, String jwt) {
-        Optional<Batch> optionalBatch = batchRepo.findById(dto.getBatchId());
-
-        if (optionalBatch.isEmpty()) {
-            return null;
-        }
-
-        Timetable timetable = new Timetable();
-        timetable.setName(dto.getName());
-        timetable.setBatch(optionalBatch.get());
-
-        return timeTableRepo.save(timetable);
+        return batchRepo.findById(dto.getBatchId())
+                .map(batch -> {
+                    Timetable timetable = new Timetable();
+                    timetable.setName(dto.getName());
+                    timetable.setBatch(batch);
+                    return timeTableRepo.save(timetable);
+                })
+                .orElseThrow(() -> new RuntimeException("Batch not found"));
     }
 
     @Override

@@ -10,9 +10,13 @@ import com.nxquar.pinpoint.Repository.UserRepo;
 import com.nxquar.pinpoint.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+
+
+@Service
 
 public class UserServiceImpl implements UserService {
 
@@ -36,7 +40,7 @@ public class UserServiceImpl implements UserService {
             Institute institute = instituteRepo.findByEmail(jwtEmail);
             if (institute != null) {
                 if (institute.getId().equals(id)) {
-                    return instituteRepo.findUsersByInstituteId(id);
+                    return userRepo.findByInstituteId(id);
                 } else {
                     throw new AccessDeniedException("You are not authorized to access users for this institute.");
                 }

@@ -1,5 +1,6 @@
 package com.nxquar.pinpoint.service.implementation;
 
+import com.nxquar.pinpoint.DTO.MessageResponse;
 import com.nxquar.pinpoint.Model.Building;
 import com.nxquar.pinpoint.Model.Users.Institute;
 import com.nxquar.pinpoint.Repository.BuildingRepo;
@@ -7,7 +8,6 @@ import com.nxquar.pinpoint.Repository.InstituteRepo;
 import com.nxquar.pinpoint.service.BuildingService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +21,7 @@ public class BuildingServiceImpl implements BuildingService {
 
     @Autowired
     private InstituteRepo instituteRepo;
+
 
 
     @Override
@@ -38,5 +39,13 @@ public class BuildingServiceImpl implements BuildingService {
                 .orElseThrow(() -> new EntityNotFoundException("Institute not found"));
 
         return buildingRepo.findByInstituteId(instituteId);
+    }
+
+    @Override
+    public MessageResponse updateBaseAltitude(Integer baseAltitude, UUID buildingId, String jwt) {
+        Building building= buildingRepo.findById(buildingId).orElseThrow(() -> new EntityNotFoundException("Building Not Present"));
+        building.setBaseAltitude(baseAltitude);
+        buildingRepo.save(building);
+        return new MessageResponse("Altitude Added Successfullt");
     }
 }

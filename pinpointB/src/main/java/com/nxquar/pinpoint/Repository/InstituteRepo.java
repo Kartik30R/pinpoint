@@ -13,7 +13,6 @@ import java.util.UUID;
 @Repository
 public interface InstituteRepo extends JpaRepository<Institute, UUID> {
     Institute findByEmail(String email);
-    List<User> findUsersByInstituteId(UUID id);
     @Query("SELECT u FROM User u WHERE u.id = :userId AND u.institute.id = :instituteId")
     User findUserByIdAndInstituteId(@Param("userId") UUID userId, @Param("instituteId") UUID instituteId);
 

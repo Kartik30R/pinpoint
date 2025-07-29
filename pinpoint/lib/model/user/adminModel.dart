@@ -1,42 +1,48 @@
-import 'package:pinpoint/model/user/baseUser.dart';
-import 'package:pinpoint/resources/constant/string/userEnum.dart';
+import 'dart:convert';
 
-class AdminModel extends BaseUser {
-  List<String> managedUsers;    // User IDs managed by the admin
-  List<String> notices;         // Notices sent by admin
-  Map<String, List<String>> locationHistory;  // User ID → Location history
+class Admin {
+  final String id;
+  final String email;
+  final String phone;
+  final String? name;
+  final String? otp;
+  final String? createdAt;
+  final String? updatedAt;
+  final bool? isVerified;
 
-  AdminModel({
-    required String id,
-    required String email,
-    required String firstName,
-    required String lastName,
-    required this.managedUsers,
-    required this.notices,
-    required this.locationHistory,
-  }) : super(
-    id: id,
-    email: email,
-    firstName: firstName,
-    lastName: lastName,
-    userType: UserType.admin,
-  );
+  Admin({
+    required this.id,
+    required this.email,
+    required this.phone,
+    this.name,
+    this.otp,
+    this.createdAt,
+    this.updatedAt,
+    this.isVerified,
+  });
 
-  @override
-  Map<String, dynamic> toJson() => super.toJson()
-    ..addAll({
-      'managedUsers': managedUsers,
-      'notices': notices,
-      'locationHistory': locationHistory,
-    });
+  factory Admin.fromJson(Map<String, dynamic> json) {
+    return Admin(
+      id: json['id'],
+      email: json['email'],
+      phone: json['phone'],
+      name: json['name'],
+      otp: json['otp'],
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
+      isVerified: json['verified'] ?? false,
+    );
+  }
 
-  factory AdminModel.fromJson(Map<String, dynamic> json) => AdminModel(
-    id: json['id'],
-    email: json['email'],
-    firstName: json['firstName'],
-    lastName: json['lastName'],
-    managedUsers: List<String>.from(json['managedUsers']),
-    notices: List<String>.from(json['notices']),
-    locationHistory: Map<String, List<String>>.from(json['locationHistory']),
-  );
+  Map<String, dynamic> toJson() {
+    return {
+      "email": email,
+      "phone": phone,
+      if (name != null) "name": name,
+    };
+  }
+
+  static List<Admin> fromJsonList(List<dynamic> jsonList) {
+    return jsonList.map((json) => Admin.fromJson(json)).toList();
+  }
 }

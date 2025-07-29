@@ -11,13 +11,16 @@ import com.nxquar.pinpoint.service.implementation.JwtService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public class LocationServices {
+
+@Service
+
+public class LocationService {
     @Autowired
     AdminRepo adminRepo;
     @Autowired
@@ -32,7 +35,7 @@ public class LocationServices {
     private LocationPointRepo locationPointRepo;
 
 
-    MessageResponse saveLocation(LocationPoint point) {
+    public MessageResponse saveLocation(LocationPoint point) {
 
 // have to save the location points and also have to mark the attendence
         // first check attendce is mark or not if not then check the timetable and

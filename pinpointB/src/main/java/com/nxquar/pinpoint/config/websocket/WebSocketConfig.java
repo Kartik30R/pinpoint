@@ -1,4 +1,4 @@
-package com.nxquar.pinpoint.service.websocket;
+package com.nxquar.pinpoint.config.websocket;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

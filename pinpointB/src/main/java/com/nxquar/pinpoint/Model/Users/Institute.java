@@ -34,6 +34,7 @@ public class Institute implements  AppUser {
     @JsonIgnore
     private String password;
 
+    private String baseAltitude;
     @Enumerated(EnumType.STRING)
     private Role role=Role.INSTITUTE;
 

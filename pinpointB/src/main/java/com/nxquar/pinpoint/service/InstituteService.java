@@ -2,13 +2,12 @@ package com.nxquar.pinpoint.service;
 
 import com.nxquar.pinpoint.DTO.InstituteRequest;
 import com.nxquar.pinpoint.DTO.MessageResponse;
-import com.nxquar.pinpoint.Model.Users.Institute;
+import com.nxquar.pinpoint.DTO.branch.InstituteResponse;
 
 import java.util.UUID;
 
 public interface InstituteService {
-    public Institute getInstituteById(UUID id , String jwt);
-    public MessageResponse updateInstitute(InstituteRequest request, String jwt);
-    public MessageResponse deleteInstitute(String jwt);
-
+    InstituteResponse getInstituteById(UUID id, String jwt);
+    MessageResponse updateInstitute(InstituteRequest request, String jwt);
+    MessageResponse deleteInstitute(String jwt);
 }

@@ -7,9 +7,14 @@ import com.nxquar.pinpoint.service.PeriodService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+
+
+
+@Service
 
 public class PeriodServiceImpl implements PeriodService {
     @Autowired
@@ -92,6 +97,7 @@ public class PeriodServiceImpl implements PeriodService {
         if(!(isInstitute || isAdmin)) {
             throw new AccessDeniedException("You are not authorized to delete this Period");
         }
+        periodRepo.delete(existingPeriod);
 
         return new MessageResponse("Period deleted");
     }

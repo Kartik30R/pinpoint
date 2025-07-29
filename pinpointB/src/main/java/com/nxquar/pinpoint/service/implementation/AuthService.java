@@ -62,7 +62,7 @@ public class AuthService {
                 User user = new User();
                 user.setEmail(req.getEmail());
                 user.setPhone(req.getPhone());
-                user.setPassword(req.getPassword()); // Consider hashing!
+                user.setPassword(req.getPassword());
                 user.setRole(Role.USER);
                 userRepository.save(user);
             }

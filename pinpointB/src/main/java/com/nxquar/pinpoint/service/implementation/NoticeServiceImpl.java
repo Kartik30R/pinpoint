@@ -3,7 +3,6 @@ package com.nxquar.pinpoint.service.implementation;
 import com.nxquar.pinpoint.DTO.MessageResponse;
 import com.nxquar.pinpoint.Model.Notice;
 import com.nxquar.pinpoint.Model.Users.Admin;
-import com.nxquar.pinpoint.Model.Users.Institute;
 import com.nxquar.pinpoint.Repository.AdminRepo;
 import com.nxquar.pinpoint.Repository.InstituteRepo;
 import com.nxquar.pinpoint.Repository.NoticeRepo;
@@ -11,8 +10,13 @@ import com.nxquar.pinpoint.Repository.UserRepo;
 import com.nxquar.pinpoint.service.NoticeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+
+
+@Service
 
 public class NoticeServiceImpl implements NoticeService {
 @Autowired
@@ -87,5 +91,14 @@ JwtService jwtService;
         noticeRepo.delete(notice);
         return new MessageResponse("Notice deleted successfully.");
     }
+
+    @Override
+    public List<Notice> getAllNotice(UUID Id) {
+        Admin admin = adminRepo.findById(Id)
+                .orElseThrow(() -> new RuntimeException("Admin not found."));
+
+        return noticeRepo.findBySentTo_Id(admin.getId());
+    }
+
 
 }

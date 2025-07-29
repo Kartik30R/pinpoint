@@ -3,5 +3,6 @@ class AppString{
     static String admin="Admin";
   static String master="Master";
 static String maplocation='assets/lecture_theater.geojson';
+static const String baseUrl="";
 
 }

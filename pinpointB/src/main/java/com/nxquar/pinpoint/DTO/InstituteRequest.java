@@ -14,4 +14,6 @@ public class InstituteRequest {
     private String phone;
     private String password;
     private Address address;
+    private String baseAltitude;
+
 }

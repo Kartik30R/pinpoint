@@ -1,5 +1,6 @@
 package com.nxquar.pinpoint.Model.Timetable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nxquar.pinpoint.Model.Users.Institute;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -16,9 +17,10 @@ public class Subject {
     
     private String name;
     private String code;
-    
+
+    @JsonIgnore
     @ManyToOne
     private Institute institute; // Owner
-    
+
 
 }
