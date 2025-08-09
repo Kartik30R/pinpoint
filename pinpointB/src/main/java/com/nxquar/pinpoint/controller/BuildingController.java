@@ -31,11 +31,13 @@ public class BuildingController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<Building> uploadBuildingGeoJson(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Building> uploadBuildingGeoJson(@RequestParam("file") MultipartFile file,  @RequestHeader("Authorization") String jwt) {
         try {
+            String token = jwt.replace("Bearer ", "");
+
             ObjectMapper mapper = new ObjectMapper();
             JsonNode geoJson = mapper.readTree(file.getInputStream());
-            Building building = locationParsingService.processGeoJsonBuilding(geoJson);
+            Building building = locationParsingService.processGeoJsonBuilding(geoJson,token);
             return ResponseEntity.ok(building);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -59,8 +61,9 @@ public class BuildingController {
     @PutMapping("/{buildingId}/altitude")
     public ResponseEntity<MessageResponse> updateBaseAltitude(@PathVariable UUID buildingId,
                                                               @RequestParam Integer baseAltitude,
+                                                              @RequestParam Integer ceilHeight,
                                                               @RequestHeader("Authorization") String jwt) {
         String token = jwt.replace("Bearer ", "");
-        return ResponseEntity.ok(buildingService.updateBaseAltitude(baseAltitude, buildingId, token));
+        return ResponseEntity.ok(buildingService.updateBaseAltitude(baseAltitude, ceilHeight,buildingId, token));
     }
 }

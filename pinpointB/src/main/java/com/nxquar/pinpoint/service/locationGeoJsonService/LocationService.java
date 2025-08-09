@@ -2,11 +2,11 @@ package com.nxquar.pinpoint.service.locationGeoJsonService;
 
 import com.nxquar.pinpoint.DTO.MessageResponse;
 import com.nxquar.pinpoint.Model.LocationPoint;
+import com.nxquar.pinpoint.Model.Timetable.Attendance;
+import com.nxquar.pinpoint.Model.Timetable.Period;
+import com.nxquar.pinpoint.Model.Timetable.Status;
 import com.nxquar.pinpoint.Model.Users.User;
-import com.nxquar.pinpoint.Repository.AdminRepo;
-import com.nxquar.pinpoint.Repository.InstituteRepo;
-import com.nxquar.pinpoint.Repository.LocationPointRepo;
-import com.nxquar.pinpoint.Repository.UserRepo;
+import com.nxquar.pinpoint.Repository.*;
 import com.nxquar.pinpoint.service.implementation.JwtService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,9 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -27,6 +29,9 @@ public class LocationService {
     UserRepo userRepo;
     @Autowired
     InstituteRepo instituteRepo;
+    @Autowired
+    private AttendanceRepo attendanceRepo;
+
 
     @Autowired
     JwtService jwtService;
@@ -36,14 +41,46 @@ public class LocationService {
 
 
     public MessageResponse saveLocation(LocationPoint point) {
-
-// have to save the location points and also have to mark the attendence
-        // first check attendce is mark or not if not then check the timetable and
-        // fetch the table also get the time table from the user batch and find perid accordin to the time now and check
-        // if current location is  under the period site or not
-        //
         locationPointRepo.save(point);
-        return new MessageResponse("location saved");
+
+        User student = point.getUser();
+        UUID batchId = student.getBatch().getId();
+        String dayOfWeek = point.getTimestamp().getDayOfWeek().name();
+        LocalTime currentTime = point.getTimestamp().toLocalTime();
+
+        Optional<Period> maybePeriod = attendanceRepo.findCurrentPeriodByBatch(batchId, dayOfWeek, currentTime);
+
+        if (maybePeriod.isEmpty()) {
+            return new MessageResponse("Location saved, but no ongoing period found.");
+        }
+
+        Period currentPeriod = maybePeriod.get();
+
+        boolean isInRoom = attendanceRepo.isUserInRoom(
+                currentPeriod.getSite().getId(),
+                point.getLongitude(),
+                point.getLatitude()
+        );
+
+        if (!isInRoom) {
+            return new MessageResponse("Location saved, but user is not inside the room for the current period.");
+        }
+
+        boolean alreadyMarked = attendanceRepo.findByStudentAndPeriod(student, currentPeriod).isPresent();
+
+        if (alreadyMarked) {
+            return new MessageResponse("Location saved. Attendance already marked.");
+        }
+
+        Attendance attendance = new Attendance();
+        attendance.setStudent(student);
+        attendance.setPeriod(currentPeriod);
+        attendance.setMarkedAt(point.getTimestamp());
+        attendance.setStatus(Status.PRESENT);
+
+        attendanceRepo.save(attendance);
+
+        return new MessageResponse("Location and attendance saved successfully.");
     }
 
     public List<LocationPoint> getLocationPoints(UUID userId, LocalDateTime start, LocalDateTime end) {

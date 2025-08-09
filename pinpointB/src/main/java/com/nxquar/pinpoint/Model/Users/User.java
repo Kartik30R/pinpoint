@@ -67,7 +67,7 @@ public class User implements  AppUser{
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "notice_id")
     )
-//    private List<Notice> notices=new ArrayList<>();
+    private List<Notice> notices=new ArrayList<>();
 
     private LocalDateTime createdAt;
 

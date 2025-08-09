@@ -14,7 +14,7 @@ class _AddressService implements AddressService {
     this.baseUrl,
     this.errorLogger,
   }) {
-    baseUrl ??= '/api/addresses';
+    baseUrl ??= 'https://e4e618771206.ngrok-free.app/api/addresses';
   }
 
   final Dio _dio;

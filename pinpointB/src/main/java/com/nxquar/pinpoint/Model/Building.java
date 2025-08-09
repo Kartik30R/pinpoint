@@ -16,6 +16,7 @@ public class Building {
     
     private String name;
     private Integer BaseAltitude;
+    private Integer ceilHeight;
     @ManyToOne
     private Institute institute;
     

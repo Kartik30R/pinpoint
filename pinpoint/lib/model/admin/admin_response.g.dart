@@ -17,8 +17,9 @@ AdminResponse _$AdminResponseFromJson(Map<String, dynamic> json) =>
           ? null
           : Address.fromJson(json['address'] as Map<String, dynamic>),
       instituteId: json['instituteId'] as String,
-      batchIds:
-          (json['batchIds'] as List<dynamic>).map((e) => e as String).toList(),
+      batches: (json['batches'] as List<dynamic>)
+          .map((e) => BatchListResponse.fromJson(e as Map<String, dynamic>))
+          .toList(),
       notices: (json['notices'] as List<dynamic>)
           .map((e) => NoticeDto.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -36,7 +37,7 @@ Map<String, dynamic> _$AdminResponseToJson(AdminResponse instance) =>
       'role': instance.role,
       'address': instance.address,
       'instituteId': instance.instituteId,
-      'batchIds': instance.batchIds,
+      'batches': instance.batches,
       'notices': instance.notices,
       'createdAt': instance.createdAt,
       'updatedAt': instance.updatedAt,

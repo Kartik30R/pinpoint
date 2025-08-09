@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:pinpoint/model/address.dart';
+import 'package:pinpoint/model/address/address.dart';
 
 part 'admin_request.g.dart';
 

@@ -2,6 +2,7 @@ package com.nxquar.pinpoint.controller;
 
 import com.nxquar.pinpoint.DTO.DayScheduleRequest;
 import com.nxquar.pinpoint.DTO.MessageResponse;
+import com.nxquar.pinpoint.DTO.timetable.DayScheduleDto;
 import com.nxquar.pinpoint.Model.Timetable.DaySchedule;
 import com.nxquar.pinpoint.service.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,8 @@ public class ScheduleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DaySchedule> getScheduleById(@PathVariable UUID id,
-                                                       @RequestHeader("Authorization") String jwt) {
+    public ResponseEntity<DayScheduleDto> getScheduleById(@PathVariable UUID id,
+                                                          @RequestHeader("Authorization") String jwt) {
         String token = jwt.replace("Bearer ", "");
         return ResponseEntity.ok(scheduleService.getScheduleById(id, token));
     }
@@ -44,13 +45,13 @@ public class ScheduleController {
                                                       @RequestBody DaySchedule newSchedule) {
         return ResponseEntity.ok(scheduleService.addDaySchedule(timetableId, newSchedule));
     }
-
     @PutMapping
-    public ResponseEntity<DaySchedule> updateSchedule(@RequestBody DaySchedule updatedSchedule,
-                                                      @RequestHeader("Authorization") String jwt) {
+    public ResponseEntity<DayScheduleDto> updateSchedule(@RequestBody DaySchedule updatedSchedule,
+                                                         @RequestHeader("Authorization") String jwt) {
         String token = jwt.replace("Bearer ", "");
         return ResponseEntity.ok(scheduleService.updateSchedule(updatedSchedule, token));
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<MessageResponse> deleteSchedule(@PathVariable UUID id,

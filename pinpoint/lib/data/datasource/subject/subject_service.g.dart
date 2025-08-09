@@ -14,7 +14,7 @@ class _SubjectService implements SubjectService {
     this.baseUrl,
     this.errorLogger,
   }) {
-    baseUrl ??= 'http://<YOUR-IP>:<PORT>/api/subjects';
+    baseUrl ??= 'https://e4e618771206.ngrok-free.app/api/subjects';
   }
 
   final Dio _dio;

@@ -11,6 +11,5 @@ abstract class AppRoutes {
   static const adminTab3 = '/admin/tab3';
 
   static const instituteTab1 = '/institute/tab1';
-  static const instituteTab2 = '/institute/tab2';
   static const instituteTab3 = '/institute/tab3';
 }

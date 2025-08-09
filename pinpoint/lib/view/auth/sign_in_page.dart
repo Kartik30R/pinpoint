@@ -15,29 +15,35 @@ class LoginPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isLoading = ValueNotifier(false);
+    
+Future<void> _submitLogin() async {
+  if (!_formKey.currentState!.validate()) return;
 
-    Future<void> _submitLogin() async {
-      if (!_formKey.currentState!.validate()) return;
+  isLoading.value = true;
 
-      isLoading.value = true;
+  try {
+    final error = await ref.read(authProvider).login(
+      _emailCtrl.text.trim(),
+      _passwordCtrl.text.trim(),
+    );
 
-      final auth = ref.read(authProvider);
-      final error = await auth.login(
-        _emailCtrl.text.trim(),
-        _passwordCtrl.text.trim(),
+    if (error == null) {
+      context.go('/');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error)),
       );
-
-      isLoading.value = false;
-
-      if (error == null) {
-        context.go('/');
-        print("Login success");
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error)),
-        );
-      }
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Login error: $e")),
+    );
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+
 
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),

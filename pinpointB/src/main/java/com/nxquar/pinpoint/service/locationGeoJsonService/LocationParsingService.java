@@ -4,12 +4,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.nxquar.pinpoint.Model.Building;
 import com.nxquar.pinpoint.Model.Floor;
 import com.nxquar.pinpoint.Model.Room;
+import com.nxquar.pinpoint.Model.Users.Institute;
 import com.nxquar.pinpoint.Repository.BuildingRepository;
 import com.nxquar.pinpoint.Repository.FloorRepository;
+import com.nxquar.pinpoint.Repository.InstituteRepo;
 import com.nxquar.pinpoint.Repository.RoomRepository;
+import com.nxquar.pinpoint.service.implementation.JwtService;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -31,12 +35,25 @@ public class    LocationParsingService {
     @Autowired
     private RoomRepository roomRepository;
 
+    @Autowired
+    private InstituteRepo instituteRepo;
+
+
+    @Autowired
+    private JwtService jwtService;
+
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
 
-    public Building processGeoJsonBuilding(JsonNode geoJson) {
+    public Building processGeoJsonBuilding(JsonNode geoJson, String jwt) {
+        String jwtEmail= jwtService.extractUserName(jwt);
+        Institute institute= instituteRepo.findByEmail(jwtEmail);
+        if (institute==null){
+            throw new AccessDeniedException("You are not authorized to update this note.");
+        }
         // Create new building
         Building building = new Building();
+        building.setInstitute(institute);
         buildingRepository.save(building);
 
         // Group features by floor

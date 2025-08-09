@@ -7,8 +7,7 @@ import 'package:pinpoint/data/exceptions/app_exceptions.dart';
 import 'package:pinpoint/data/network/base_api_response.dart';
 
 class NetworkApiService implements BaseApiServices {
-final baseUrl = 'https://049175ca7491.ngrok-free.app';
-@override
+ @override
 Future getGetApiResponse(String url, {Map<String, String>? headers}) async {
   if (kDebugMode) print(url);
 

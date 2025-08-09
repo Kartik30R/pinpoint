@@ -18,33 +18,39 @@ class SignUpPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     Future<void> _submitRegister() async {
-      if (!_formKey.currentState!.validate() || _selectedRole.value == null)
-        return;
+  if (!_formKey.currentState!.validate() || _selectedRole.value == null) return;
 
-      _isLoading.value = true;
+  _isLoading.value = true;
 
-      final req = AuthRequest.forRegister(
-        email: _emailCtrl.text.trim(),
-        phone: _phoneCtrl.text.trim(),
-        password: _passwordCtrl.text.trim(),
-        role: _selectedRole.value,
+  try {
+    final req = AuthRequest.forRegister(
+      email: _emailCtrl.text.trim(),
+      phone: _phoneCtrl.text.trim(),
+      password: _passwordCtrl.text.trim(),
+      role: _selectedRole.value,
+    );
+
+    final error = await ref.read(authProvider).register(req);
+
+    if (error == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Registered successfully")),
       );
-
-      final response =
-          await ref.read(authProvider).authServices.register(req);
-      _isLoading.value = false;
-
-      if (response.statusCode == "200") {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Registered successfully")),
-        );
-        Navigator.pushReplacementNamed(context, '/login');
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response.message ?? "Signup failed")),
-        );
-      }
+      Navigator.pushReplacementNamed(context, '/login');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error)),
+      );
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Unexpected error: $e")),
+    );
+  } finally {
+    _isLoading.value = false;
+  }
+}
+
 
     return Scaffold(
       appBar: AppBar(title: const Text('Sign Up')),

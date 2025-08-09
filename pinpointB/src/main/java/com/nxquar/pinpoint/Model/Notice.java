@@ -31,9 +31,9 @@ public class Notice {
     private Admin sentBy;
 
 
-//    @JsonIgnore
-//    @ManyToMany(mappedBy = "notices")
-//    private List<User> sentTo=new ArrayList<>();
+    @JsonIgnore
+    @ManyToMany(mappedBy = "notices")
+    private List<User> sentTo=new ArrayList<>();
 
     private LocalDateTime validUntil;
 

@@ -2,6 +2,7 @@ package com.nxquar.pinpoint.controller;
 
 import com.nxquar.pinpoint.DTO.MessageResponse;
 import com.nxquar.pinpoint.DTO.TimetableRequest;
+import com.nxquar.pinpoint.DTO.timetable.TimetableDetailDto;
 import com.nxquar.pinpoint.Model.Timetable.Timetable;
 import com.nxquar.pinpoint.service.TimetableServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class TimetableController {
     private TimetableServices timetableServices;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Timetable> getTimetableById(@PathVariable UUID id) {
+    public ResponseEntity<TimetableDetailDto> getTimetableById(@PathVariable UUID id) {
         return ResponseEntity.ok(timetableServices.getTimeTableById(id));
     }
 

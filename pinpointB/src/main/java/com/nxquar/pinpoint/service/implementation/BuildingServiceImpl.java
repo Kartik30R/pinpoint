@@ -42,9 +42,10 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @Override
-    public MessageResponse updateBaseAltitude(Integer baseAltitude, UUID buildingId, String jwt) {
+    public MessageResponse updateBaseAltitude(Integer baseAltitude, Integer ceilHeight,UUID buildingId, String jwt) {
         Building building= buildingRepo.findById(buildingId).orElseThrow(() -> new EntityNotFoundException("Building Not Present"));
         building.setBaseAltitude(baseAltitude);
+        building.setCeilHeight(ceilHeight);
         buildingRepo.save(building);
         return new MessageResponse("Altitude Added Successfullt");
     }

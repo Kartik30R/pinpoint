@@ -1,35 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:pinpoint/resources/routes/app_routes.dart';
 import 'package:pinpoint/resources/routes/bottom_navigation_provider.dart';
+import 'package:pinpoint/view/users/institute/Navigation/institute_shell.dart';
+import 'package:pinpoint/view/users/institute/tab_screens/institute_screen.dart';
+import 'package:pinpoint/view/users/institute/tab_screens/institute_screen3.dart';
 
-
-class InstituteBottomNavBar extends ConsumerWidget {
-  const InstituteBottomNavBar({super.key});
-
-  static const tabs = [
-    AppRoutes.instituteTab1,
-    AppRoutes.instituteTab2,
-    AppRoutes.instituteTab3,
-  ];
+class InstituteShell extends ConsumerWidget {
+  final child;
+  const InstituteShell( {this.child,super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final index = ref.watch(instituteNavIndexProvider);
 
-    return BottomNavigationBar(
-      currentIndex: index,
-      onTap: (i) {
-        ref.read(instituteNavIndexProvider.notifier).state = i;
-        context.go(tabs[i]);
-        
-      },
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Inst 1'),
-        BottomNavigationBarItem(icon: Icon(Icons.group), label: 'Inst 2'),
-        BottomNavigationBarItem(icon: Icon(Icons.event), label: 'Inst 3'),
-      ],
+    return Scaffold(
+      body: IndexedStack(
+        index: index,
+        children:   [
+          InstituteScreen(),   
+          InstituteScreen3(),  
+        ],
+      ),
+      bottomNavigationBar: InstituteBottomNavBar(),
     );
   }
 }

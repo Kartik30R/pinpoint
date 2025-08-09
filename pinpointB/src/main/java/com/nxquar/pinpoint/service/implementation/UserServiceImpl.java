@@ -1,10 +1,15 @@
 package com.nxquar.pinpoint.service.implementation;
 
 import com.nxquar.pinpoint.DTO.MessageResponse;
+import com.nxquar.pinpoint.DTO.UpdateUserDto;
+import com.nxquar.pinpoint.DTO.UserDetailDto;
+import com.nxquar.pinpoint.DTO.UserListDto;
+import com.nxquar.pinpoint.Model.Batch;
 import com.nxquar.pinpoint.Model.Users.Admin;
 import com.nxquar.pinpoint.Model.Users.Institute;
 import com.nxquar.pinpoint.Model.Users.User;
 import com.nxquar.pinpoint.Repository.AdminRepo;
+import com.nxquar.pinpoint.Repository.BatchRepo;
 import com.nxquar.pinpoint.Repository.InstituteRepo;
 import com.nxquar.pinpoint.Repository.UserRepo;
 import com.nxquar.pinpoint.service.UserService;
@@ -14,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -27,20 +33,28 @@ public class UserServiceImpl implements UserService {
     AdminRepo adminRepo;
 
     @Autowired
+    BatchRepo batchRepo;
+
+
+    @Autowired
     InstituteRepo instituteRepo;
 
     @Autowired
     JwtService jwtService;
 
     @Override
-    public List<User> getAllUser(UUID id, String jwt) {
+    public List<UserListDto> getAllUser(UUID id, String jwt) {
         try {
             String jwtEmail = jwtService.extractUserName(jwt);
 
             Institute institute = instituteRepo.findByEmail(jwtEmail);
             if (institute != null) {
                 if (institute.getId().equals(id)) {
-                    return userRepo.findByInstituteId(id);
+                    return userRepo.findByInstituteId(id)
+                            .stream()
+                            .map(UserListDto::fromEntity)
+                            .collect(Collectors.toList());
+
                 } else {
                     throw new AccessDeniedException("You are not authorized to access users for this institute.");
                 }
@@ -49,11 +63,15 @@ public class UserServiceImpl implements UserService {
             Admin admin = adminRepo.findByEmail(jwtEmail);
             if (admin != null) {
                 if (admin.getId().equals(id)) {
-                    return adminRepo.findUsersByAdminId(id);
+                    return adminRepo.findUsersByAdminId(id)
+                            .stream()
+                            .map(UserListDto::fromEntity)
+                            .collect(Collectors.toList());
                 } else {
                     throw new AccessDeniedException("You are not authorized to access users for this admin.");
                 }
             }
+
 
             throw new AccessDeniedException("Invalid JWT or unauthorized access.");
         } catch (AccessDeniedException ade) {
@@ -65,32 +83,31 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public User getUserById(UUID userId, String jwt) {
+    public UserDetailDto getUserById(UUID userId, String jwt) {
         try {
             String jwtEmail = jwtService.extractUserName(jwt);
 
-
+            // 1. Check if the user is accessing their own data
             User user = userRepo.findByEmail(jwtEmail);
             if (user != null && user.getId().equals(userId)) {
-                return userRepo.findById(userId)
-                        .orElseThrow(() -> new RuntimeException("User not found."));
+                return UserDetailDto.fromEntity(user);
             }
 
-
+            // 2. Check if an admin has access to the user
             Admin admin = adminRepo.findByEmail(jwtEmail);
             if (admin != null) {
                 User found = adminRepo.findUserByIdAndAdminId(userId, admin.getId());
-                if (found != null) return found;
+                if (found != null) return UserDetailDto.fromEntity(found);
             }
 
-
+            // 3. Check if institute has access
             Institute institute = instituteRepo.findByEmail(jwtEmail);
             if (institute != null) {
                 User found = instituteRepo.findUserByIdAndInstituteId(userId, institute.getId());
-                if (found != null) return found;
+                if (found != null) return UserDetailDto.fromEntity(found);
             }
 
-            // If no valid access path
+            // 4. Deny if none match
             throw new AccessDeniedException("You are not authorized to access this user.");
         } catch (AccessDeniedException ade) {
             throw ade;
@@ -98,6 +115,7 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Error while fetching user.", e);
         }
     }
+
     @Override
     public MessageResponse deleteUser(UUID userId, String jwt) {
         try {
@@ -124,40 +142,46 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+
     @Override
-    public MessageResponse UpdateUser(UUID id, String jwt, User updatedData) {
+    public MessageResponse UpdateUser(UUID id, String jwt, UpdateUserDto updatedData) {
         String jwtEmail = jwtService.extractUserName(jwt);
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found."));
 
         boolean authorized = false;
 
-        // Check if request is from the same user
-        if (user.getEmail().equals(jwtEmail)) {
-            authorized = true;
-        }
+        if (user.getEmail().equals(jwtEmail)) authorized = true;
 
-        // Check if request is from the user's admin
         Admin admin = adminRepo.findByEmail(jwtEmail);
-        if (admin != null && user.getAdmin() != null && admin.getId().equals(user.getAdmin().getId())) {
+        if (admin != null && user.getAdmin() != null && admin.getId().equals(user.getAdmin().getId()))
             authorized = true;
-        }
 
-        // Check if request is from the user's institute
         Institute institute = instituteRepo.findByEmail(jwtEmail);
-        if (institute != null && user.getInstitute() != null && institute.getId().equals(user.getInstitute().getId())) {
+        if (institute != null && user.getInstitute() != null && institute.getId().equals(user.getInstitute().getId()))
             authorized = true;
-        }
 
         if (!authorized) {
             throw new AccessDeniedException("You are not authorized to update this user.");
         }
 
-        // Do your updates — update fields that are safe
+        // Safe field updates
         user.setName(updatedData.getName());
         user.setPhone(updatedData.getPhone());
         user.setAddress(updatedData.getAddress());
-        user.setBatch(updatedData.getBatch());
+        user.setVerified(updatedData.isVerified());
+
+        if (updatedData.getBatchId() != null) {
+            Batch batch = batchRepo.findById(updatedData.getBatchId())
+                    .orElseThrow(() -> new RuntimeException("Batch not found."));
+            user.setBatch(batch);
+        }
+
+        if (updatedData.getAdminId() != null) {
+            Admin newAdmin = adminRepo.findById(updatedData.getAdminId())
+                    .orElseThrow(() -> new RuntimeException("Admin not found."));
+            user.setAdmin(newAdmin);
+        }
 
         userRepo.save(user);
 

@@ -14,7 +14,7 @@ class _PeriodService implements PeriodService {
     this.baseUrl,
     this.errorLogger,
   }) {
-    baseUrl ??= '/api/periods';
+    baseUrl ??= 'https://e4e618771206.ngrok-free.app/api/periods';
   }
 
   final Dio _dio;

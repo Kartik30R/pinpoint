@@ -9,15 +9,20 @@ import 'package:pinpoint/view/users/admin/navigation/admin_shell.dart';
 import 'package:pinpoint/view/users/admin/tab_screens/admin_Screen_1.dart';
 import 'package:pinpoint/view/users/admin/tab_screens/admin_screen_2.dart';
 import 'package:pinpoint/view/users/admin/tab_screens/admin_screen_3.dart';
-import 'package:pinpoint/view/users/institute/Navigation/institute_shell.dart';
+import 'package:pinpoint/view/users/institute/Navigation/institute_bottom_navigation.dart';
 import 'package:pinpoint/view/users/institute/tab_screens/institute_screen.dart';
-import 'package:pinpoint/view/users/institute/tab_screens/institute_screen2.dart';
 import 'package:pinpoint/view/users/institute/tab_screens/institute_screen3.dart';
 import 'package:pinpoint/view/users/user/navigation/user_shell.dart';
 import 'package:pinpoint/view/users/user/tab_screens/userScreen.dart';
 import 'package:pinpoint/view/users/user/tab_screens/userScreen2.dart';
 import 'package:pinpoint/view/users/user/tab_screens/userScreen3.dart';
 import 'package:pinpoint/viewModel/auth/auth_provider.dart';
+
+
+// final _rootKey = GlobalKey<NavigatorState>();
+final _adminKey = GlobalKey<NavigatorState>();
+final _userKey = GlobalKey<NavigatorState>();
+final _instituteKey = GlobalKey<NavigatorState>();
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authController = ref.watch(authProvider);
@@ -65,7 +70,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
       // Admin Shell
       ShellRoute(
-        navigatorKey: GlobalKey<NavigatorState>(),
+        navigatorKey: _adminKey,
         builder: (context, state, child) => AdminShell(child: child),
         routes: [
           GoRoute(path: AppRoutes.adminTab1, builder: (_, __) => AdminScreen1()),
@@ -76,7 +81,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
       // User Shell
       ShellRoute(
-        navigatorKey: GlobalKey<NavigatorState>(),
+        navigatorKey: _userKey,
         builder: (context, state, child) => UserShell(child: child),
         routes: [
           GoRoute(path: AppRoutes.userTab1, builder: (_, __) => UserScreen()),
@@ -87,11 +92,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
       // Institute Shell
       ShellRoute(
-        navigatorKey: GlobalKey<NavigatorState>(),
+        navigatorKey: _instituteKey,
         builder: (context, state, child) => InstituteShell(child: child),
         routes: [
           GoRoute(path: AppRoutes.instituteTab1, builder: (_, __) => InstituteScreen()),
-          GoRoute(path: AppRoutes.instituteTab2, builder: (_, __) => InstituteScreen2()),
           GoRoute(path: AppRoutes.instituteTab3, builder: (_, __) => InstituteScreen3()),
         ],
       ),

@@ -1,6 +1,9 @@
 package com.nxquar.pinpoint.controller;
 
 import com.nxquar.pinpoint.DTO.MessageResponse;
+import com.nxquar.pinpoint.DTO.UpdateUserDto;
+import com.nxquar.pinpoint.DTO.UserDetailDto;
+import com.nxquar.pinpoint.DTO.UserListDto;
 import com.nxquar.pinpoint.Model.Users.User;
 import com.nxquar.pinpoint.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,15 +21,15 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/all/{id}")
-    public ResponseEntity<List<User>> getAllUsers(@PathVariable UUID id,
-                                                  @RequestHeader("Authorization") String jwt) {
+    public ResponseEntity<List<UserListDto>> getAllUsers(@PathVariable UUID id,
+                                                         @RequestHeader("Authorization") String jwt) {
         String token = jwt.replace("Bearer ", "");
         return ResponseEntity.ok(userService.getAllUser(id, token));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable UUID id,
-                                            @RequestHeader("Authorization") String jwt) {
+    public ResponseEntity<UserDetailDto> getUserById(@PathVariable UUID id,
+                                                     @RequestHeader("Authorization") String jwt) {
         String token = jwt.replace("Bearer ", "");
         return ResponseEntity.ok(userService.getUserById(id, token));
     }
@@ -34,7 +37,7 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<MessageResponse> updateUser(@PathVariable UUID id,
                                                       @RequestHeader("Authorization") String jwt,
-                                                      @RequestBody User updatedUser) {
+                                                      @RequestBody UpdateUserDto updatedUser) {
         String token = jwt.replace("Bearer ", "");
         return ResponseEntity.ok(userService.UpdateUser(id, token, updatedUser));
     }

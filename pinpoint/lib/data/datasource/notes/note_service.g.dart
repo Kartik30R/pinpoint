@@ -14,7 +14,7 @@ class _NoteService implements NoteService {
     this.baseUrl,
     this.errorLogger,
   }) {
-    baseUrl ??= 'https://your-api-url.com/api';
+    baseUrl ??= 'https://e4e618771206.ngrok-free.app';
   }
 
   final Dio _dio;

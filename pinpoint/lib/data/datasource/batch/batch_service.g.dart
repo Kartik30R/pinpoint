@@ -13,7 +13,9 @@ class _BatchService implements BatchService {
     this._dio, {
     this.baseUrl,
     this.errorLogger,
-  });
+  }) {
+    baseUrl ??= 'https://e4e618771206.ngrok-free.app';
+  }
 
   final Dio _dio;
 
@@ -22,13 +24,14 @@ class _BatchService implements BatchService {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<HttpResponse<BatchModel>> createBatch(BatchModel batch) async {
+  Future<HttpResponse<BatchListResponse>> createBatch(
+      BatchListResponse batch) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(batch.toJson());
-    final _options = _setStreamType<HttpResponse<BatchModel>>(Options(
+    final _options = _setStreamType<HttpResponse<BatchListResponse>>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
@@ -45,9 +48,9 @@ class _BatchService implements BatchService {
           baseUrl,
         )));
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late BatchModel _value;
+    late BatchListResponse _value;
     try {
-      _value = BatchModel.fromJson(_result.data!);
+      _value = BatchListResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

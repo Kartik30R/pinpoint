@@ -1,60 +1,75 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pinpoint/DTO/auth.dart';
+import 'package:pinpoint/data/datasource/auth/auth_service.dart';
+import 'package:pinpoint/data/network/interseptor/auth_dio_intersecptor.dart';
 import 'package:pinpoint/repository/Storage/secure_storage_service.dart';
-import 'package:pinpoint/repository/auth_services/auth_service.dart';
 import 'package:pinpoint/viewModel/storage/secure_storage_provider.dart';
 
 final authProvider = Provider<AuthController>((ref) {
+  final storage = ref.read(secureStorageProvider); 
+
+  final dio = Dio();
+  dio.interceptors.add(AuthInterceptor(storage)); 
+
+  final authService = AuthService(dio);
+
   return AuthController(
-    authServices: AuthServices(),
-    storageService: ref.read(secureStorageProvider),
+    authService: authService,
+    storageService: storage,
   );
 });
 
+
 class AuthController {
-  final AuthServices authServices;
+  final AuthService authService;
   final SecureStorageService storageService;
 
   AuthController({
-    required this.authServices,
+    required this.authService,
     required this.storageService,
   });
 
-  /// Login and persist JWT
   Future<String?> login(String email, String password) async {
-    final authReq = AuthRequest.forLogin(email: email, password: password);
-    final response = await authServices.login(authReq);
+    try {
+      final authReq = AuthRequest.forLogin(email: email, password: password);
+      final response = await authService.login(authReq);
 
-    if (response.statusCode == "200" && response.jwt != null) {
-      await storageService.saveAuthData(
-        jwt: response.jwt!,
-        role: response.role ?? '',
-        userId: response.email ?? '', // Ideally should be user ID, not email
-      );
-      return null;
-    } else {
-      return response.message ?? response.error ?? "Login failed";
+      if (response.response.statusCode == 200 && response.data.jwt != null) {
+        await storageService.saveAuthData(
+          jwt: response.data.jwt!,
+          role: response.data.role ?? '',
+          userId: response.data.email ?? '',
+        );
+        return null;
+      } else {
+        return response.data.message ?? response.data.error ?? "Login failed";
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      return "Login exception: $e";
     }
   }
 
-  /// Register a new user
   Future<String?> register(AuthRequest request) async {
-    final response = await authServices.register(request);
-
-    if (response.statusCode == "200") {
-      // You could auto-login or return success
-      return null;
-    } else {
-      return response.message ?? response.error ?? "Registration failed";
+    try {
+      final response = await authService.register(request);
+      if (response.response.statusCode == 200) {
+        return null;
+      } else {
+        return response.data.message ?? response.data.error ?? "Registration failed";
+      }
+    } catch (e) {
+      return "Registration exception: $e";
     }
   }
 
-  /// Clear stored data
   Future<void> logout() async {
     await storageService.clearAll();
+    debugPrint("logout called");
   }
 
-  /// Check login state
   Future<bool> isLoggedIn() async {
     return await storageService.isLoggedIn();
   }

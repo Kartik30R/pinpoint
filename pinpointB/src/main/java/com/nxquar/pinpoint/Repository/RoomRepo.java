@@ -20,5 +20,6 @@ public interface RoomRepo extends JpaRepository<Room, UUID> {
 """)
     List<Room> findRoomsByInstitute(@Param("instituteId") UUID instituteId);
     List<Room> findByFloorLevel(Integer level);
+    Room findByName(String name);
 
 }

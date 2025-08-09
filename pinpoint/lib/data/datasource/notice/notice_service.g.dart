@@ -13,7 +13,9 @@ class _NoticeService implements NoticeService {
     this._dio, {
     this.baseUrl,
     this.errorLogger,
-  });
+  }) {
+    baseUrl ??= 'https://e4e618771206.ngrok-free.app';
+  }
 
   final Dio _dio;
 

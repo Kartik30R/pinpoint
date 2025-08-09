@@ -1,8 +1,15 @@
 package com.nxquar.pinpoint.service.implementation;
 
 import com.nxquar.pinpoint.DTO.MessageResponse;
+import com.nxquar.pinpoint.DTO.timetable.PeriodDto;
+import com.nxquar.pinpoint.Model.Room;
+import com.nxquar.pinpoint.Model.Timetable.DaySchedule;
 import com.nxquar.pinpoint.Model.Timetable.Period;
+import com.nxquar.pinpoint.Model.Timetable.Subject;
+import com.nxquar.pinpoint.Repository.DayScheduleRepo;
 import com.nxquar.pinpoint.Repository.PeriodRepo;
+import com.nxquar.pinpoint.Repository.RoomRepo;
+import com.nxquar.pinpoint.Repository.SubjectRepo;
 import com.nxquar.pinpoint.service.PeriodService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,36 +28,51 @@ public class PeriodServiceImpl implements PeriodService {
     private PeriodRepo periodRepo;
 
     @Autowired
+    private SubjectRepo subjectRepo;
+
+    @Autowired
+    private RoomRepo roomRepo;
+    @Autowired
+    private DayScheduleRepo dayScheduleRepo;
+
+
+    @Autowired
     private  JwtService jwtService;
 
+
+
     @Override
-    public Period getPeriodById(UUID id, String jwt) {
+    public PeriodDto getPeriodById(UUID id, String jwt) {
         Period period = periodRepo.findById(id)
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Period with this id does not Exist:" + id.toString()));
-        return period;
+                .orElseThrow(() -> new EntityNotFoundException("Period with this id does not exist: " + id));
+        return PeriodDto.fromEntity(period);
     }
 
     @Override
     public List<Period> getAllPeriods(UUID dayScheduleId, String jwt) {
-        List<Period> periodList= periodRepo.findByDayScheduleId(dayScheduleId);
-        return periodList;
+        return List.of();
     }
 
     @Override
-    public Period createPeriod(Period period, String jwt) {
+    public PeriodDto createPeriod(PeriodDto dto, String jwt) {
         String role = jwtService.extractRole(jwt);
-        boolean isInstitute =  role.equals("INSTITUTE");
-        boolean isAdmin =  role.equals("ADMIN");
-
-        if(!(isInstitute || isAdmin)) {
+        if (!(role.equals("INSTITUTE") || role.equals("ADMIN"))) {
             throw new AccessDeniedException("You are not authorized to create this Period");
         }
-        return periodRepo.save(period);
+
+        Subject subject = subjectRepo.findById(dto.getSubjectId()).orElseThrow();
+
+        Room room = roomRepo.findById(dto.getRoomId())
+                .orElseThrow(() -> new EntityNotFoundException("Room not found"));
+         DaySchedule schedule = dayScheduleRepo.findById(dto.getScheduleDayId()).orElseThrow();
+
+        Period saved = periodRepo.save(dto.toEntity(subject, room, schedule));
+        return PeriodDto.fromEntity(saved);
     }
 
+
     @Override
-    public Period updatePeriod(Period updatedPeriod, String jwt) {
+    public PeriodDto updatePeriod(PeriodDto updatedPeriod, String jwt) {
         Period existingPeriod= periodRepo.findById(updatedPeriod.getId()).orElseThrow(
                 ()->new EntityNotFoundException("Period with this Id does not exist:"+ updatedPeriod.getId()
         ));
@@ -59,6 +81,7 @@ public class PeriodServiceImpl implements PeriodService {
         boolean isInstitute =  role.equals("INSTITUTE");
         boolean isAdmin =  role.equals("ADMIN");
 
+        Subject subject= new Subject();
         if(!(isInstitute || isAdmin)) {
             throw new AccessDeniedException("You are not authorized to update this Period");
         }
@@ -75,13 +98,16 @@ public class PeriodServiceImpl implements PeriodService {
         if (updatedPeriod.getEndTime() != null)
             existingPeriod.setEndTime(updatedPeriod.getEndTime());
 
-        if (updatedPeriod.getSubject() != null)
-            existingPeriod.setSubject(updatedPeriod.getSubject());
+        if (updatedPeriod.getSubjectName() != null) {
+            subject = subjectRepo.findByName(updatedPeriod.getName());
+            existingPeriod.setSubject(subject);
+        }
+        if (updatedPeriod.getRoomName() != null) {
+            Room room = roomRepo.findByName(updatedPeriod.getRoomName());
+            existingPeriod.setSite(room);
+        }
 
-        if (updatedPeriod.getSite() != null)
-            existingPeriod.setSite(updatedPeriod.getSite());
-
-        return periodRepo.save(existingPeriod);
+        return PeriodDto.fromEntity(periodRepo.save(existingPeriod));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.nxquar.pinpoint.DTO;
 
+import com.nxquar.pinpoint.DTO.branch.BatchListResponse;
 import com.nxquar.pinpoint.Model.Address;
 import com.nxquar.pinpoint.Model.Notice;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,7 @@ public class AdminResponse {
     private String role;
     private Address address;
     private UUID instituteId;
-    private List<UUID> batchIds;
+    private List<BatchListResponse> batchs;
     private List<Notice> notices;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

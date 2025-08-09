@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:pinpoint/model/batch.dart';
 import 'package:pinpoint/model/batch/batch_detail_response.dart';
 import 'package:pinpoint/model/batch/batch_list_response.dart';
 import 'package:pinpoint/model/message_response.dart';
@@ -14,8 +13,8 @@ abstract class BatchService {
   factory BatchService(Dio dio, {String baseUrl}) = _BatchService;
 
   @POST("/api/batches")
-  Future<HttpResponse<BatchModel>> createBatch(
-    @Body() BatchModel batch,
+  Future<HttpResponse<BatchListResponse>> createBatch(
+    @Body() BatchListResponse batch,
   );
 
   @GET("/api/batches")

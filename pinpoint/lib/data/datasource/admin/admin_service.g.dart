@@ -14,7 +14,7 @@ class _AdminService implements AdminService {
     this.baseUrl,
     this.errorLogger,
   }) {
-    baseUrl ??= '/api/admins';
+    baseUrl ??= 'https://e4e618771206.ngrok-free.app/api/admins';
   }
 
   final Dio _dio;

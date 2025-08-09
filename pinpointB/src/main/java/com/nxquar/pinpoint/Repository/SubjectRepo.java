@@ -8,5 +8,5 @@ import java.util.UUID;
 
 public interface SubjectRepo extends JpaRepository<Subject, UUID> {
     List<Subject> findByInstituteId(UUID id);
-
+Subject findByName(String name);
 }

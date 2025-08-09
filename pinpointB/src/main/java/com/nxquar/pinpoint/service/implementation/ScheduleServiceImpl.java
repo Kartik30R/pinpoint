@@ -2,7 +2,10 @@ package com.nxquar.pinpoint.service.implementation;
 
 import com.nxquar.pinpoint.DTO.DayScheduleRequest;
 import com.nxquar.pinpoint.DTO.MessageResponse;
+import com.nxquar.pinpoint.DTO.timetable.DayScheduleDto;
+import com.nxquar.pinpoint.DTO.timetable.PeriodDto;
 import com.nxquar.pinpoint.Model.Timetable.DaySchedule;
+import com.nxquar.pinpoint.Model.Timetable.Period;
 import com.nxquar.pinpoint.Model.Timetable.Timetable;
 import com.nxquar.pinpoint.Repository.DayScheduleRepo;
 import com.nxquar.pinpoint.Repository.TimeTableRepo;
@@ -46,13 +49,21 @@ private DayScheduleRepo dayScheduleRepo;
     }
 
     @Override
-    public DaySchedule getScheduleById(UUID id, String jwt) {
+    public DayScheduleDto getScheduleById(UUID id, String jwt) {
         DaySchedule schedule = dayScheduleRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Schedule not found"));
 
+        List<PeriodDto> periodDtos = schedule.getPeriods().stream()
+                .map(p ->  PeriodDto.fromEntity(p))
+                .toList();
 
-        return schedule;
+        return new DayScheduleDto(
+                schedule.getId(),
+                schedule.getDayOfWeek(),
+                periodDtos
+        );
     }
+
 
     @Override
     public List<DaySchedule> getSchedulesByTimetableId(UUID timetableId, String jwt) {
@@ -73,15 +84,12 @@ private DayScheduleRepo dayScheduleRepo;
     }
 
     @Override
-    public DaySchedule updateSchedule(DaySchedule updatedSchedule, String jwt) {
+    public DayScheduleDto updateSchedule(DaySchedule updatedSchedule, String jwt) {
         DaySchedule existingSchedule = dayScheduleRepo.findById(updatedSchedule.getId())
                 .orElseThrow(() -> new EntityNotFoundException("DaySchedule not found"));
 
         String role = jwtService.extractRole(jwt);
-        boolean isInstitute =  role.equals("INSTITUTE");
-        boolean isAdmin =  role.equals("ADMIN");
-
-        if(!(isInstitute || isAdmin)) {
+        if (!(role.equals("INSTITUTE") || role.equals("ADMIN"))) {
             throw new AccessDeniedException("You are not authorized to update this schedule");
         }
 
@@ -89,7 +97,18 @@ private DayScheduleRepo dayScheduleRepo;
             existingSchedule.setDayOfWeek(updatedSchedule.getDayOfWeek());
         }
 
-        return dayScheduleRepo.save(existingSchedule);
+        DaySchedule saved = dayScheduleRepo.save(existingSchedule);
+
+        // Map to DTO
+        List<PeriodDto> periodDtos = saved.getPeriods().stream()
+                .map(p ->  PeriodDto.fromEntity(p))
+                .toList();
+
+        return new DayScheduleDto(
+                saved.getId(),
+                saved.getDayOfWeek(),
+                periodDtos
+        );
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.nxquar.pinpoint.controller;
 import com.nxquar.pinpoint.DTO.LocationDTO;
 import com.nxquar.pinpoint.Model.LocationPoint;
 import com.nxquar.pinpoint.Model.Users.User;
+import com.nxquar.pinpoint.Repository.UserRepo;
 import com.nxquar.pinpoint.service.UserService;
 import com.nxquar.pinpoint.service.locationGeoJsonService.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,12 @@ public class LocationWebSocketController {
     @Autowired
 private LocationService locationService;
     @Autowired
-private UserService userService;
+private UserRepo userRepo;
 
     @MessageMapping("/location")
     @SendTo("/topic/location")
-    public void receiveLocation(@Payload LocationDTO location, @Header("jwt") String jwt){
-       User user = userService.getUserById(location.getUserId(),jwt);
+    public void receiveLocation(@Payload LocationDTO location){
+       User user = userRepo.findById(location.getUserId()).orElseThrow();
         LocationPoint point = new LocationPoint();
         point.setUser(user);
         point.setLatitude(location.getLatitude());
